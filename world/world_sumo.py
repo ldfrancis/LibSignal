@@ -366,6 +366,7 @@ class World(object):
             sumo_cmd = [sumolib.checkBinary('sumo-gui'), "--start", "--quit-on-end"]
         else:
             sumo_cmd = [sumolib.checkBinary('sumo')]
+        sumo_dict['dir'] = "./LibSignal/"+sumo_dict["dir"] #TODO: configure base directory
         if not sumo_dict.get('combined_file'):
             sumo_cmd += ['-n', os.path.join(sumo_dict['dir'], sumo_dict['roadnetFile']),
                          '-r', os.path.join(sumo_dict['dir'], sumo_dict['flowFile']),

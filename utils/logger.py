@@ -106,6 +106,7 @@ def load_config(path, previous_includes=[]):
     -path: path of .yml file
     -previous_includes: list of .yml already processed
     """
+    path = "./LibSignal/"+path #TODO: make base directory configurable
     if path in previous_includes:
         raise ValueError(
             f"Cyclic configs include detected. {path} included in previous {previous_includes}"
@@ -210,10 +211,10 @@ class SeverityLevelBetween(logging.Filter):
         return self.min_level <= record.levelno < self.max_level
 
 def setup_logging(level):
-    root = logging.getLogger()
+    root = logging.getLogger("tsc")
 
     # Perform setup only if logging has not been configured
-    if not root.hasHandlers():
+    if True:#not root.hasHandlers():
         root.setLevel(level)
         log_formatter = logging.Formatter(
             "%(asctime)s (%(levelname)s): %(message)s",
@@ -246,4 +247,5 @@ def setup_logging(level):
         )
         handler_file.setLevel(level)  # TODO: SET LEVEL
         root.addHandler(handler_file)
+    
     return root

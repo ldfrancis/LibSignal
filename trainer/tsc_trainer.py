@@ -4,6 +4,7 @@ from common.metrics import Metrics
 from environment import TSCEnv
 from common.registry import Registry
 from trainer.base_trainer import BaseTrainer
+import wandb
 
 
 @Registry.register_trainer("tsc")
@@ -45,6 +46,7 @@ class TSCTrainer(BaseTrainer):
         self.dataset.initiate(ep=self.episodes, step=self.steps, interval=self.action_interval)
         self.yellow_time = Registry.mapping['trainer_mapping']['setting'].param['yellow_length']
         # consists of path of output dir + log_dir + file handlers name
+        #TODO: configure base directory
         self.log_file = os.path.join(Registry.mapping['logger_mapping']['path'].path,
                                      Registry.mapping['logger_mapping']['setting'].param['log_dir'],
                                      os.path.basename(self.logger.handlers[-1].baseFilename).rstrip('_BRF.log') + '_DTL.log'
@@ -120,6 +122,7 @@ class TSCTrainer(BaseTrainer):
         '''
         total_decision_num = 0
         flush = 0
+        self.wandb_log = {}
         for e in range(self.episodes):
             # TODO: check this reset agent
             self.metric.clear()
@@ -188,6 +191,12 @@ class TSCTrainer(BaseTrainer):
             
             self.writeLog("TRAIN", e, self.metric.real_average_travel_time(),\
                 mean_loss, self.metric.rewards(), self.metric.queue(), self.metric.delay(), self.metric.throughput())
+            self.wandb_log.update({
+                "train_avg_travel_time": self.metric.real_average_travel_time(),
+                "train_throughput": self.metric.throughput(),
+                "train_rewards": self.metric.rewards(),
+            }
+            )
             self.logger.info("step:{}/{}, q_loss:{}, rewards:{}, queue:{}, delay:{}, throughput:{}".format(i, self.steps,\
                 mean_loss, self.metric.rewards(), self.metric.queue(), self.metric.delay(), int(self.metric.throughput())))
             if e % self.save_rate == 0:
@@ -198,6 +207,8 @@ class TSCTrainer(BaseTrainer):
                      self.metric.lane_queue()[j]))
             if self.test_when_train:
                 self.train_test(e)
+            wandb.log(self.wandb_log)
+            
         # self.dataset.flush([ag.replay_buffer for ag in self.agents])
         [ag.save_model(e=self.episodes) for ag in self.agents]
 
@@ -234,6 +245,12 @@ class TSCTrainer(BaseTrainer):
             self.metric.queue(), self.metric.delay(), int(self.metric.throughput())))
         self.writeLog("TEST", e, self.metric.real_average_travel_time(),\
             100, self.metric.rewards(),self.metric.queue(),self.metric.delay(), self.metric.throughput())
+        self.wandb_log.update({
+                "eval_avg_travel_time": self.metric.real_average_travel_time(),
+                "eval_throughput": self.metric.throughput(),
+                "eval_rewards": self.metric.rewards(),
+        }
+         )
         return self.metric.real_average_travel_time()
 
     def test(self, drop_load=True):

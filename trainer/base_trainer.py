@@ -19,7 +19,8 @@ class BaseTrainer(ABC):
         cpu=False,
         name="base"
     ):
-        self.path = os.path.join('configs/sim', Registry.mapping['command_mapping']['setting'].param['network'] + '.cfg')
+        # TODO: configure base directory
+        self.path = os.path.join("./LibSignal",'configs/sim', Registry.mapping['command_mapping']['setting'].param['network'] + '.cfg')
         self.save_replay = Registry.mapping['world_mapping']['setting'].param['saveReplay']
         if self.save_replay:
             if Registry.mapping['command_mapping']['setting'].param['world'] == 'cityflow':

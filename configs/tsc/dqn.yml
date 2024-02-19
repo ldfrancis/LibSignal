@@ -3,7 +3,7 @@ includes:
 
 model:
   name: dqn
-  train_model: True
+  train_model: False
   load_model: True
   test_model: True
   epsilon: 0.1
@@ -13,7 +13,7 @@ model:
   phase: True
 
 world:
-  gui: False
+  gui: True
 
 
 trainer:
