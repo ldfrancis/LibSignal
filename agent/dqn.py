@@ -21,8 +21,9 @@ class DQNAgent(RLAgent):
     '''
     DQNAgent determines each intersection's action with its own intersection information.
     '''
-    def __init__(self, world, rank):
+    def __init__(self, world, rank, device="cpu"):
         super().__init__(world, world.intersection_ids[rank])
+        self.device = device
         self.buffer_size = Registry.mapping['trainer_mapping']['setting'].param['buffer_size']
         self.replay_buffer = deque(maxlen=self.buffer_size)
 
@@ -69,6 +70,7 @@ class DQNAgent(RLAgent):
         self.optimizer = optim.RMSprop(self.model.parameters(),
                                        lr=self.learning_rate,
                                        alpha=0.9, centered=False, eps=1e-7)
+        
 
     def __repr__(self):
         return self.model.__repr__()
@@ -155,10 +157,10 @@ class DQNAgent(RLAgent):
                 feature = np.concatenate([ob, phase], axis=1)
         else:
             feature = ob
-        observation = torch.tensor(feature, dtype=torch.float32)
+        observation = torch.tensor(feature, dtype=torch.float32)#.to(self.device)
         # TODO: no need to calculate gradient when interacting with environment
         actions = self.model(observation, train=False)
-        actions = actions.clone().detach().numpy()
+        actions = actions.clone().cpu().detach().numpy()
         return np.argmax(actions, axis=1)
 
     def sample(self):
@@ -179,7 +181,7 @@ class DQNAgent(RLAgent):
         :param: None
         :return model: DQN model
         '''
-        model = DQNNet(self.ob_length, self.action_space.n)
+        model = DQNNet(self.ob_length, self.action_space.n)#.to(self.device)
         return model
 
     def remember(self, last_obs, last_phase, actions, actions_prob, rewards, obs, cur_phase, done, key):
@@ -238,6 +240,12 @@ class DQNAgent(RLAgent):
         '''
         samples = random.sample(self.replay_buffer, self.batch_size)
         b_t, b_tp, rewards, actions = self._batchwise(samples)
+
+        # b_t = b_t.to(self.device)
+        # b_tp = b_tp.to(self.device)
+        # rewards = rewards.to(self.device)
+        # actions = actions.to(self.device)
+
         out = self.target_model(b_tp, train=False)
         target = rewards + self.gamma * torch.max(out, dim=1)[0]
         target_f = self.model(b_t, train=False)
@@ -250,7 +258,7 @@ class DQNAgent(RLAgent):
         self.optimizer.step()
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
-        return loss.clone().detach().numpy()
+        return loss.cpu().clone().detach().numpy()
 
     def update_target_network(self):
         '''

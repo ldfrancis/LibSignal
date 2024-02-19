@@ -18,7 +18,7 @@ from torch.nn.utils import clip_grad_norm_
 
 @Registry.register_model('ppo')
 class PPOAgent(RLAgent):
-    def __init__(self, world, rank):
+    def __init__(self, world, rank, device="cpu"):
         super().__init__(world, world.intersection_ids[rank])
         self.buffer_size = Registry.mapping['trainer_mapping']['trainer_setting'].param['buffer_size']
         self.replay_buffer_env = deque(maxlen=self.buffer_size)

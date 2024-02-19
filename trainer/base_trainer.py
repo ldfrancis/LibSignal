@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from common.registry import Registry
 
+torch.cuda.is_available()
 
 @Registry.register_trainer("base")
 class BaseTrainer(ABC):

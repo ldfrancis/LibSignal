@@ -4,11 +4,17 @@ includes:
 model:
   name: dqn
   train_model: True
+  load_model: True
+  test_model: True
   epsilon: 0.1
   epsilon_decay: 0.995
   epsilon_min: 0.01
   one_hot: True
   phase: True
+
+world:
+  gui: False
+
 
 trainer:
   learning_start: 1000

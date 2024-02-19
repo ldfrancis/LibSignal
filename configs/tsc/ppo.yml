@@ -16,6 +16,7 @@ model:
   grad_clip: 5.0
   NEIGHBOR_NUM: 4
   NEIGHBOR_EDGE_NUM: 4
+  train_model: True
 
 
 trainer:

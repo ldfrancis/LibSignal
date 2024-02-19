@@ -14,7 +14,7 @@ import argparse
 # parseargs
 parser = argparse.ArgumentParser(description='Run Experiment')
 parser.add_argument('--thread_num', type=int, default=4, help='number of threads')  # used in cityflow
-parser.add_argument('--ngpu', type=str, default="-1", help='gpu to be used')  # choose gpu card
+parser.add_argument('--ngpu', type=str, default="0", help='gpu to be used')  # choose gpu card
 parser.add_argument('--prefix', type=str, default='test', help="the number of prefix in this running process")
 parser.add_argument('--seed', type=int, default=None, help="seed for pytorch backend")
 parser.add_argument('--debug', type=bool, default=True)
@@ -41,6 +41,7 @@ class Runner:
         instantiate runner object with processed config and register config into Registry class
         """
         self.config, self.duplicate_config = build_config(pArgs)
+         
         self.config_registry()
 
     def config_registry(self):

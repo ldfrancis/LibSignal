@@ -25,7 +25,7 @@ class MPLightAgent(RLAgent):
     '''
     MPLightAgent consists of FRAP agent and methods for training agents, communicating with environment, etc.
     '''
-    def __init__(self, world, rank):
+    def __init__(self, world, rank, device="cpu"):
         super().__init__(world,world.intersection_ids[rank])
         self.dic_agent_conf = Registry.mapping['model_mapping']['setting']
         self.dic_traffic_env_conf = Registry.mapping['world_mapping']['setting']
@@ -215,7 +215,7 @@ class MPLightAgent(RLAgent):
         '''
         comp_mask = []
         for i in range(len(self.phase_pairs)):
-            zeros = np.zeros(len(self.phase_pairs) - 1, dtype=np.int)
+            zeros = np.zeros(len(self.phase_pairs) - 1, dtype=np.int32)
             cnt = 0
             for j in range(len(self.phase_pairs)):
                 if i == j: continue

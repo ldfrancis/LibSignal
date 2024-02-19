@@ -353,7 +353,7 @@ class World(object):
     '''
     World Class is mainly used for creating a SUMO engine and maintain information about SUMO world.
     '''
-    def __init__(self, sumo_config, placeholder=0, **kwargs):
+    def __init__(self, sumo_config, placeholder=0, **kwargs):   
         if kwargs['interface'] == 'libsumo':
             self.interface_flag = True
         elif kwargs['interface'] == 'traci':
@@ -363,7 +363,7 @@ class World(object):
         with open(sumo_config) as f:
             sumo_dict = json.load(f)
         if sumo_dict['gui'] == "True" or sumo_dict['gui'] == True:
-            sumo_cmd = [sumolib.checkBinary('sumo-gui')]
+            sumo_cmd = [sumolib.checkBinary('sumo-gui'), "--start", "--quit-on-end"]
         else:
             sumo_cmd = [sumolib.checkBinary('sumo')]
         if not sumo_dict.get('combined_file'):
@@ -377,7 +377,7 @@ class World(object):
         self.route = os.path.join(sumo_dict['dir'], sumo_dict['flowFile'])
         self.sumo_cmd = sumo_cmd
         self.warning = sumo_dict['no_warning']
-        print("building world...")
+        print("SUMO: building world...")
         self.connection_name = sumo_dict['name']
         self.map = sumo_dict['roadnetFile'].split('/')[-1].split('.')[0]
         
@@ -470,6 +470,8 @@ class World(object):
 
         # get in_lanes and out_lanes
         self.in_lanes, self.out_lanes = self.get_in_out_lanes()
+
+        # breakpoint()
 
     def generate_valid_phase(self):
         '''
